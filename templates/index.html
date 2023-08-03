@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Line Chart</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div style="width: 900px; height: 600px;">
+        <canvas id="lineChart"></canvas>
+    </div>
+    <script>
+        const ctx = document.getElementById('lineChart').getContext('2d');
+        const lineChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: [],
+                datasets: [{
+                    label: 'Y-axis (0 to 2.5)',
+                    data: [],
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 2,
+                    fill: false,
+                }]
+            },
+            options: {
+                scales: {
+                    x: {
+                        display: true
+                    },
+                    y: {
+                        beginAtZero: true,
+                        max: 2.5
+                    }
+                }
+            },
+        });
+
+        const socket = new WebSocket(`ws://${window.location.host}/ws/`);
+        socket.onmessage = function(event) {
+            const chartData = JSON.parse(event.data);
+            lineChart.data.labels = chartData.x;
+            lineChart.data.datasets[0].data = chartData.y;
+            lineChart.update();
+        };
+    </script>
+</body>
+</html>
